@@ -19,6 +19,9 @@ y_train = np.array([[1.7], [2.76], [2.09], [3.19], [1.694], [1.573],
                     [3.366], [2.596], [2.53], [1.221], [2.827], 
                     [3.465], [1.65], [2.904], [1.3]], dtype=np.float32)
 
+print(x_train.shape, y_train.shape)
+# exit()
+
 # Linear regression model
 model = nn.Linear(input_size, output_size)
 
