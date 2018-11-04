@@ -11,7 +11,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 input_size = 784
 hidden_size = 500
 num_classes = 10
-num_epochs = 5
+num_epochs = 2
 batch_size = 100
 learning_rate = 0.001
 
@@ -48,33 +48,42 @@ class NeuralNet(nn.Module):
         out = self.fc2(out)
         return out
 
+    def forward_hidden(self, x):
+        hidden_out = self.fc1(x)
+        hidden_out = self.relu(hidden_out)
+        return hidden_out
+
 model = NeuralNet(input_size, hidden_size, num_classes).to(device)
 
-# Loss and optimizer
-criterion = nn.CrossEntropyLoss()
-optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)  
-
-# Train the model
-total_step = len(train_loader)
-for epoch in range(num_epochs):
-    for i, (images, labels) in enumerate(train_loader):  
-        # Move tensors to the configured device
-        images = images.reshape(-1, 28*28).to(device)
-        labels = labels.to(device)
-        
-        # Forward pass
-        outputs = model(images)
-        loss = criterion(outputs, labels)
-        
-        # Backward and optimize
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
-        
-        if (i+1) % 100 == 0:
-            print ('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}' 
-                   .format(epoch+1, num_epochs, i+1, total_step, loss.item()))
-
+# # Loss and optimizer
+# criterion = nn.CrossEntropyLoss()
+# optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+#
+# # Train the model
+# total_step = len(train_loader)
+# for epoch in range(num_epochs):
+#     for i, (images, labels) in enumerate(train_loader):
+#         # Move tensors to the configured device
+#         images = images.reshape(-1, 28*28).to(device)
+#         labels = labels.to(device)
+#
+#         # Forward pass
+#         outputs = model(images)
+#         loss = criterion(outputs, labels)
+#
+#         # Backward and optimize
+#         optimizer.zero_grad()
+#         loss.backward()
+#         optimizer.step()
+#
+#         if (i+1) % 100 == 0:
+#             print ('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}'
+#                    .format(epoch+1, num_epochs, i+1, total_step, loss.item()))
+#
+# # Save the model checkpoint
+# torch.save(model.state_dict(), 'model.ckpt')
+# exit()
+model.load_state_dict(torch.load('model.ckpt'))
 # Test the model
 # In test phase, we don't need to compute gradients (for memory efficiency)
 with torch.no_grad():
@@ -83,12 +92,13 @@ with torch.no_grad():
     for images, labels in test_loader:
         images = images.reshape(-1, 28*28).to(device)
         labels = labels.to(device)
-        outputs = model(images)
+        outputs = model.forward(images)
+        # hidden_outputs = model.forward_hidden(images)
+        # print(hidden_outputs.shape)
+        # exit()
         _, predicted = torch.max(outputs.data, 1)
         total += labels.size(0)
         correct += (predicted == labels).sum().item()
 
     print('Accuracy of the network on the 10000 test images: {} %'.format(100 * correct / total))
 
-# Save the model checkpoint
-torch.save(model.state_dict(), 'model.ckpt')
