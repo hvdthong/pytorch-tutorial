@@ -55,34 +55,34 @@ class NeuralNet(nn.Module):
 
 model = NeuralNet(input_size, hidden_size, num_classes).to(device)
 
-# # Loss and optimizer
-# criterion = nn.CrossEntropyLoss()
-# optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
-#
-# # Train the model
-# total_step = len(train_loader)
-# for epoch in range(num_epochs):
-#     for i, (images, labels) in enumerate(train_loader):
-#         # Move tensors to the configured device
-#         images = images.reshape(-1, 28*28).to(device)
-#         labels = labels.to(device)
-#
-#         # Forward pass
-#         outputs = model(images)
-#         loss = criterion(outputs, labels)
-#
-#         # Backward and optimize
-#         optimizer.zero_grad()
-#         loss.backward()
-#         optimizer.step()
-#
-#         if (i+1) % 100 == 0:
-#             print ('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}'
-#                    .format(epoch+1, num_epochs, i+1, total_step, loss.item()))
-#
-# # Save the model checkpoint
-# torch.save(model.state_dict(), 'model.ckpt')
-# exit()
+# Loss and optimizer
+criterion = nn.CrossEntropyLoss()
+optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+
+# Train the model
+total_step = len(train_loader)
+for epoch in range(num_epochs):
+    for i, (images, labels) in enumerate(train_loader):
+        # Move tensors to the configured device
+        images = images.reshape(-1, 28*28).to(device)
+        labels = labels.to(device)
+
+        # Forward pass
+        outputs = model(images)
+        loss = criterion(outputs, labels)
+
+        # Backward and optimize
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+
+        if (i+1) % 100 == 0:
+            print ('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}'
+                   .format(epoch+1, num_epochs, i+1, total_step, loss.item()))
+
+# Save the model checkpoint
+torch.save(model.state_dict(), 'model.ckpt')
+exit()
 model.load_state_dict(torch.load('model.ckpt'))
 # Test the model
 # In test phase, we don't need to compute gradients (for memory efficiency)
